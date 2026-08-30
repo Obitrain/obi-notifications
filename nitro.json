@@ -1,0 +1,23 @@
+{
+  "cxxNamespace": ["obitrain_reactnativenotifications"],
+  "ios": {
+    "iosModuleName": "ReactNativeNotifications"
+  },
+  "android": {
+    "androidNamespace": ["obitrain","reactnativenotifications"],
+    "androidCxxLibName": "obitrain_reactnativenotifications"
+  },
+  "autolinking": {
+    "ReactNativeNotifications": {
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "ReactNativeNotifications"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "ReactNativeNotifications"
+      }
+    }
+  },
+  "ignorePaths": ["node_modules"]
+}
