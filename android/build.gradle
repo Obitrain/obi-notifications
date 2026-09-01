@@ -2,7 +2,8 @@ buildscript {
   ext.ReactNativeNotifications = [
     kotlinVersion: "2.0.21",
     minSdkVersion: 24,
-    compileSdkVersion: 36
+    compileSdkVersion: 36,
+    ndkVersion: "27.1.12297006"
   ]
 
   ext.getExtOrDefault = { prop ->
@@ -40,6 +41,8 @@ android {
   namespace "com.margelo.nitro.obitrain.reactnativenotifications"
 
   compileSdkVersion getExtOrDefault("compileSdkVersion")
+  // follow the app's NDK so libc++_shared matches at runtime
+  ndkVersion getExtOrDefault("ndkVersion")
 
   defaultConfig {
     minSdkVersion getExtOrDefault("minSdkVersion")
@@ -109,4 +112,7 @@ android {
 dependencies {
   implementation "com.facebook.react:react-android"
   implementation project(":react-native-nitro-modules")
+  implementation "androidx.core:core-ktx:1.13.1"
+  // matches obiapp's firebase-bom 31.1.1; the app's own BoM wins if newer
+  implementation "com.google.firebase:firebase-messaging:23.1.1"
 }

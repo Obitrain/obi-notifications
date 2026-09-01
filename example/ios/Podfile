@@ -17,6 +17,10 @@ end
 target 'ReactNativeNotificationsExample' do
   config = use_native_modules!
 
+  # pure-Swift OS layer of @obitrain/react-native-notifications;
+  # imported by AppDelegate.swift
+  pod 'ObiNotificationsCore', :path => '../..'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.

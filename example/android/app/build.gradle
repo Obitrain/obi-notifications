@@ -79,7 +79,7 @@ android {
 
     namespace "obitrain.reactnativenotifications.example"
     defaultConfig {
-        applicationId "obitrain.reactnativenotifications.example"
+        applicationId "com.obitrain.obiapp.dev.release" // matches an obiapp google-services.json client for FCM testing
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -117,3 +117,5 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+apply plugin: "com.google.gms.google-services"
