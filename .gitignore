@@ -84,3 +84,6 @@ android/generated
 
 # React Native Nitro Modules
 nitrogen/
+
+# Firebase config borrowed from obiapp for local FCM testing
+example/android/app/google-services.json

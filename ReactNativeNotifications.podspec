@@ -14,13 +14,15 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/Obitrain/react-native-notifications.git", :tag => "#{s.version}" }
 
   s.source_files = [
-    "ios/**/*.{swift}",
-    "ios/**/*.{m,mm}",
+    "ios/nitro/**/*.{swift}",
+    "ios/nitro/**/*.{m,mm}",
     "cpp/**/*.{hpp,cpp}",
   ]
 
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
+  # pure-Swift OS layer; app AppDelegates import this one
+  s.dependency 'ObiNotificationsCore'
 
   load 'nitrogen/generated/ios/ReactNativeNotifications+autolinking.rb'
   add_nitrogen_files(s)
