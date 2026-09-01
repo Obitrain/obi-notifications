@@ -1,6 +1,6 @@
 require "json"
 
-package = JSON.parse(File.read(File.join(__dir__, "package.json")))
+package = JSON.parse(File.read(File.join(__dir__, "..", "..", "package.json")))
 
 # Pure-Swift OS integration layer (no Nitro/C++ types) so app code can
 # `import ObiNotificationsCore` from a plain-Swift AppDelegate.
