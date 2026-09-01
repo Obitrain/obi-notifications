@@ -48,16 +48,16 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Obitrain/react-native-notifications.git"
+    "url": "git+https://github.com/Obitrain/obi-notifications.git"
   },
   "author": "Julien Brayere <julien.brayere@obitrain.com> (https://obitrain.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Obitrain/react-native-notifications/issues"
+    "url": "https://github.com/Obitrain/obi-notifications/issues"
   },
-  "homepage": "https://github.com/Obitrain/react-native-notifications#readme",
+  "homepage": "https://github.com/Obitrain/obi-notifications#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://gitlab.com/api/v4/projects/10478649/packages/npm/"
   },
   "devDependencies": {
     "@eslint/compat": "^2.1.0",
