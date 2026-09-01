@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "15.1" }
   s.source       = { :git => "https://github.com/Obitrain/react-native-notifications.git", :tag => "#{s.version}" }
 
-  s.source_files = ["ios/core/**/*.swift"]
+  s.source_files = ["**/*.swift"]
   s.frameworks   = ["UserNotifications", "UIKit"]
   s.swift_version = "5.9"
   s.pod_target_xcconfig = {

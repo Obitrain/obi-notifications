@@ -1,6 +1,6 @@
 {
   "name": "@obitrain/react-native-notifications",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Push notifications for Obitrain: raw APNs on iOS, FCM on Android (Nitro module)",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

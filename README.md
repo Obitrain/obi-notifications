@@ -25,7 +25,7 @@ Autolinking registers the Nitro module on both platforms. iOS needs two manual s
 
 The iOS side ships as two CocoaPods:
 
-- `ObiNotificationsCore` is pure Swift. It owns the `UNUserNotificationCenterDelegate`, APNs token forwarding, and the initial-notification capture. It has no C++ types, so the app's Swift `AppDelegate` can import it.
+- `ObiNotificationsCore` (`ios/core/`) is pure Swift. It owns the `UNUserNotificationCenterDelegate`, APNs token forwarding, and the initial-notification capture. It has no C++ types, so the app's Swift `AppDelegate` can import it.
 - `ReactNativeNotifications` is the Nitro pod. Autolinking adds it; it depends on the core pod.
 
 Why two pods: a nitrogen-generated pod exposes C++ headers through its clang module, which makes it un-importable from app Swift unless C++ interop is enabled app-wide. Keeping the delegate in a plain-Swift pod avoids that.
@@ -33,7 +33,7 @@ Why two pods: a nitrogen-generated pod exposes C++ headers through its clang mod
 1. Add the core pod to `ios/Podfile` inside the app target, then run `pod install`:
 
    ```ruby
-   pod 'ObiNotificationsCore', :path => '../node_modules/@obitrain/react-native-notifications'
+   pod 'ObiNotificationsCore', :path => '../node_modules/@obitrain/react-native-notifications/ios/core'
    ```
 
 2. Attach the delegate before React Native starts and forward the three `UIApplicationDelegate` notification callbacks. The library does not swizzle; every hook is explicit:
