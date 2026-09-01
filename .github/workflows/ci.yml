@@ -101,6 +101,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Stub google-services.json
+        run: cp example/android/app/google-services.ci.json example/android/app/google-services.json
+
       - name: Build example for Android
         env:
           JAVA_OPTS: "-XX:MaxHeapSize=6g"
