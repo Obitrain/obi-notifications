@@ -70,7 +70,29 @@ Why two pods: a nitrogen-generated pod exposes C++ headers through its clang mod
 
 ### Android
 
-Nothing beyond autolinking. The library depends on `firebase-messaging` directly and declares `POST_NOTIFICATIONS` in its manifest. Requesting that permission at runtime on Android 13+ is the app's responsibility; the library does not prompt, and `postLocalNotification` logs a warning and renders nothing while it is denied.
+Nothing beyond autolinking. The library depends on `firebase-messaging` directly, registers its own `FirebaseMessagingService` through manifest merging, and declares `POST_NOTIFICATIONS`. Requesting that permission at runtime on Android 13+ is the app's responsibility; the library does not prompt, and notifications are silently skipped while it is denied.
+
+Notifications rendered by the library use the app's FCM manifest meta-data when present: `com.google.firebase.messaging.default_notification_icon`, `default_notification_color`, and `default_notification_channel_id` (falling back to the app icon and the `default` channel).
+
+How an incoming FCM message is routed:
+
+| App state | Message | What happens |
+| --- | --- | --- |
+| foreground | any | `registerNotificationReceivedForeground` fires; the app decides what to show (obiapp calls `postLocalNotification`) |
+| background or killed | data-only | the library posts it to the system tray; `registerNotificationReceivedBackground` fires if JS is running |
+| background or killed | with `notification` block | FCM itself posts it; the library is not involved until the tap |
+
+Taps are handled two ways, depending on who rendered the notification:
+
+- **Posted by the library** (data-only messages, `postLocalNotification`): the tap runs an invisible trampoline activity inside the app process. App alive: `registerNotificationOpened` fires. App killed: the payload is parked and `getInitialNotification()` returns it after the cold start; no opened event fires.
+- **Rendered by FCM** (messages with a `notification` block while backgrounded): the tap re-enters the launcher activity with the data as intent extras. App alive: `registerNotificationOpened` fires through `onNewIntent`. App killed: `getInitialNotification()` reads the activity's intent. One gap remains: if the process was killed but the task is still in recents, Android recreates the activity with its *old* intent and delivers the new one through `onNewIntent` before React Native is ready, so the payload is lost. Close it with three lines in `MainActivity`:
+
+  ```kotlin
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent) // keeps FCM tap extras readable by getInitialNotification after a relaunch
+  }
+  ```
 
 The library inherits `ndkVersion` from the root project rather than pinning its own, because a mismatch with the app's NDK fails at startup with a libc++ symbol error (`__cxa_init_primary_exception`).
 
@@ -118,7 +140,7 @@ const initial = await Notifications.getInitialNotification();
 | --- | --- | --- |
 | `registerRemoteNotifications(): Promise<void>` | both | iOS: requests alert, badge, and sound permission, then calls `registerForRemoteNotifications`. Resolves when the permission prompt completes, before the token arrives. Android: fetches the FCM token; resolves after the fetch attempt. |
 | `getInitialNotification(): Promise<Notification \| undefined>` | both | Payload of the notification whose tap launched the app, `undefined` on a normal launch. iOS returns it once and then clears it. Android reads the launch intent's extras and returns them whenever they carry a `google.message_id` or `google.sent_time` key. |
-| `postLocalNotification(payload)` | Android | Posts a notification immediately on the `default` channel, with `payload.title` and `payload.body` (or `payload.notification.title` / `.body`). Create that channel with `setNotificationChannel({ channelId: 'default', ... })` first; Android 8+ drops notifications on unknown channels. Used to display FCM messages that arrive while the app is in the foreground, which FCM does not display itself. |
+| `postLocalNotification(payload)` | Android | Posts a notification immediately with `payload.title` and `payload.body` (or `payload.notification.title` / `.body`) on `payload.channelId`, else the FCM default channel from the manifest, else `default`. Create the channel with `setNotificationChannel` first; Android 8+ drops notifications on unknown channels. Tapping it re-enters the app with the payload (see the Android section). Used to display FCM messages that arrive while the app is in the foreground, which FCM does not display itself. |
 | `setNotificationChannel(config)` | Android | Creates or updates a notification channel. `importance` takes `NotificationManager` values 0 to 5. |
 | `events()` | both | Returns the event registrars below. |
 
@@ -130,11 +152,11 @@ const initial = await Notifications.getInitialNotification();
 | `registerNotificationOpened` | `(notification, completion: () => void) => void` |
 | `registerNotificationReceivedBackground` | `(notification, completion: (r: NotificationBackgroundFetchResult) => void) => void` |
 
-Each registrar replaces the previous callback for that event. A device token received before `registerRemoteNotificationsRegistered` is called is replayed on registration. The other events are not queued: register their callbacks before calling `registerRemoteNotifications()`.
+Each registrar replaces the previous callback for that event. A device token received before `registerRemoteNotificationsRegistered` is called is replayed on registration. On Android, foreground and opened events that arrive before their callback is registered are queued (last 10) and replayed; background events are dropped when no callback is registered, since the app process may have been started by FCM without JS. On iOS, register callbacks before calling `registerRemoteNotifications()`.
 
 ### Payload shape
 
-`notification.payload` is the raw platform payload: the APNs `userInfo` dictionary on iOS, the FCM message on Android. Custom data sent under `aps.data` on iOS is reachable as `payload.aps.data`, so the read `notification.payload?.aps?.data ?? notification.payload` works unchanged.
+`notification.payload` is the APNs `userInfo` dictionary on iOS, so custom data sent under `aps.data` is reachable as `payload.aps.data`. On Android it is a flat object: every FCM `data` key at the root, plus `title` and `body` from the message's `notification` block when present, plus `google.message_id` and `google.sent_time`. The read `notification.payload?.aps?.data ?? notification.payload` therefore yields the custom data on both platforms.
 
 Payloads cross the Nitro boundary as JSON strings and are parsed in the JS wrapper. A payload that fails to parse becomes `{}`.
 
@@ -150,9 +172,9 @@ The foreground, opened, and background callbacks receive a `completion` function
 
 ## Limitations
 
-- Android does not receive messages yet. There is no `FirebaseMessagingService`, so the foreground, opened, and background events never fire on Android, and token rotation (`onNewToken`) is not observed. Token fetch, channels, `postLocalNotification`, and `getInitialNotification` from launch-intent extras are the working Android surface.
-- Notifications posted with `postLocalNotification` carry no content intent; tapping them does nothing.
-- On Android, a tap while the app is alive reaches the activity through `onNewIntent`, which React Native does not forward to libraries. The app's `MainActivity` will need a small override once the tap path exists.
+- Android runs no JS when the app is killed: a data-only message is shown in the tray, but `registerNotificationReceivedBackground` does not fire until the app is next running. There is no headless JS task.
+- On Android, `registerNotificationReceivedBackground`'s completion value is accepted and ignored; only iOS has a fetch completion block.
+- Notifications rendered by FCM itself, tapped after a process kill while the task survives in recents, reach `getInitialNotification()` only with the `MainActivity` override shown in the Android section.
 - On iOS, the cold-start tap path and the `content-available` background path are wired but unverified on a device. Simulator APNs tokens are 80 bytes; physical devices return 32 bytes.
 - Out of scope by design: scheduled or local reminders, action buttons and categories, badge management, notification grouping, rich media attachments, and an inbox or history API.
 

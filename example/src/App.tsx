@@ -76,6 +76,16 @@ export default function App() {
     appendLog('registerRemoteNotifications() resolved');
   }, [appendLog]);
 
+  const postLocal = useCallback(() => {
+    appendLog('postLocalNotification()');
+    Notifications.postLocalNotification({
+      title: 'Local notification',
+      body: 'Tap me',
+      kind: 'local',
+      id: String(Date.now()),
+    });
+  }, [appendLog]);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -85,6 +95,15 @@ export default function App() {
       >
         <Text style={styles.buttonLabel}>Register for notifications</Text>
       </TouchableOpacity>
+      {Platform.OS === 'android' && (
+        <TouchableOpacity
+          style={[styles.button, styles.secondary]}
+          onPress={postLocal}
+          testID="post-local-btn"
+        >
+          <Text style={styles.buttonLabel}>Post local notification</Text>
+        </TouchableOpacity>
+      )}
       <Text style={styles.label}>Token:</Text>
       <Text testID="token" style={styles.token} selectable>
         {token ?? '(none)'}
@@ -113,6 +132,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 14,
     alignItems: 'center',
+  },
+  secondary: {
+    marginTop: 8,
+    backgroundColor: '#4b5563',
   },
   buttonLabel: {
     color: 'white',
