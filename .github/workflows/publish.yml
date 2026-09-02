@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # npm provenance
+      id-token: write # npm trusted publishing (OIDC) + provenance, no token needed
 
     steps:
       - name: Checkout
@@ -19,6 +19,12 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
+
+      - name: Point npm at the public registry
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
 
       - name: Check tag matches package version
         if: github.ref_type == 'tag'
@@ -32,8 +38,4 @@ jobs:
           yarn prepare
 
       - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          npm publish --provenance
+        run: npm publish --provenance
