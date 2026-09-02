@@ -57,7 +57,7 @@
   },
   "homepage": "https://github.com/Obitrain/obi-notifications#readme",
   "publishConfig": {
-    "registry": "https://gitlab.com/api/v4/projects/10478649/packages/npm/"
+    "access": "public"
   },
   "devDependencies": {
     "@eslint/compat": "^2.1.0",
