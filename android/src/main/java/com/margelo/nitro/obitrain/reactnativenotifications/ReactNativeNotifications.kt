@@ -1,13 +1,13 @@
 package com.margelo.nitro.obitrain.reactnativenotifications
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Bundle
+import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.facebook.proguard.annotations.DoNotStrip
+import com.facebook.react.bridge.ActivityEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.margelo.nitro.NitroModules
 import com.margelo.nitro.core.Promise
@@ -15,31 +15,39 @@ import org.json.JSONObject
 
 @DoNotStrip
 class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
-  private var tokenCallback: ((String) -> Unit)? = null
   private var registrationFailedCallback: ((RegistrationErrorEvent) -> Unit)? = null
-  private var foregroundCallback: ((String) -> Promise<Promise<NotificationCompletion>>)? = null
-  private var openedCallback: ((String) -> Promise<Promise<Unit>>)? = null
-  private var backgroundCallback: ((String) -> Promise<Promise<BackgroundFetchResult>>)? = null
-
-  private var lastToken: String? = null
 
   private val context: Context?
     get() = NitroModules.applicationContext
+
+  init {
+    // warm taps: the tray intent re-enters the (singleTask) activity through onNewIntent
+    NitroModules.applicationContext?.addActivityEventListener(object : ActivityEventListener {
+      override fun onNewIntent(intent: Intent) {
+        val extras = intent.extras ?: return
+        if (NotificationPayload.isNotificationExtras(extras)) {
+          Log.d(TAG, "notification opened via onNewIntent")
+          NotificationEvents.emitOpened(NotificationPayload.fromExtras(extras).toString())
+        }
+      }
+
+      override fun onActivityResult(
+        activity: Activity, requestCode: Int, resultCode: Int, data: Intent?
+      ) = Unit
+    })
+  }
 
   override fun registerRemoteNotifications(): Promise<Unit> {
     val promise = Promise<Unit>()
     FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
       if (task.isSuccessful) {
-        val token = task.result
-        lastToken = token
-        tokenCallback?.invoke(token)
+        NotificationEvents.emitToken(task.result)
       } else {
-        val error = task.exception
         registrationFailedCallback?.invoke(
           RegistrationErrorEvent(
             code = "fcm-token-fetch-failed",
             domain = "com.google.firebase.messaging",
-            localizedDescription = error?.message ?: "Unknown FCM token error"
+            localizedDescription = task.exception?.message ?: "Unknown FCM token error"
           )
         )
       }
@@ -49,33 +57,23 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
   }
 
   override fun getInitialNotification(): Promise<String?> {
+    // our own tray entries go through the trampoline; FCM-rendered ones land in the
+    // launcher activity's intent extras
+    NotificationEvents.initialNotification?.let {
+      NotificationEvents.initialNotification = null
+      return Promise.resolved(it)
+    }
     val extras = NitroModules.applicationContext?.currentActivity?.intent?.extras
-    val json = extras?.takeIf { isRemoteNotificationExtras(it) }?.let { bundleToJson(it) }
+    val json = extras
+      ?.takeIf { NotificationPayload.isNotificationExtras(it) }
+      ?.let { NotificationPayload.fromExtras(it).toString() }
     return Promise.resolved(json)
   }
 
   override fun postLocalNotification(payloadJson: String) {
     val ctx = context ?: return
     val payload = runCatching { JSONObject(payloadJson) }.getOrNull() ?: JSONObject()
-    val title = payload.optString("title").ifEmpty {
-      payload.optJSONObject("notification")?.optString("title") ?: ""
-    }
-    val body = payload.optString("body").ifEmpty {
-      payload.optJSONObject("notification")?.optString("body") ?: ""
-    }
-    val builder = NotificationCompat.Builder(ctx, DEFAULT_CHANNEL_ID)
-      .setContentTitle(title)
-      .setContentText(body)
-      .setSmallIcon(ctx.applicationInfo.icon)
-      .setAutoCancel(true)
-      .setPriority(NotificationCompat.PRIORITY_HIGH)
-    try {
-      NotificationManagerCompat.from(ctx)
-        .notify(System.currentTimeMillis().toInt(), builder.build())
-    } catch (e: SecurityException) {
-      // POST_NOTIFICATIONS not granted (API 33+); nothing to render
-      Log.w(TAG, "postLocalNotification skipped: ${e.message}")
-    }
+    NotificationDisplay.post(ctx, payload)
   }
 
   override fun setNotificationChannel(channel: NotificationChannelConfig) {
@@ -95,45 +93,36 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
   }
 
   override fun onTokenReceived(callback: (String) -> Unit) {
-    tokenCallback = callback
-    // replay so registration order doesn't matter
-    lastToken?.let { callback(it) }
+    NotificationEvents.setTokenCallback(callback)
   }
 
   override fun onRegistrationFailed(callback: (RegistrationErrorEvent) -> Unit) {
     registrationFailedCallback = callback
   }
 
+  // Android has no OS completion block to honour, so the JS promises are awaited only to
+  // surface rejections instead of leaking them.
   override fun onNotificationReceivedForeground(
     callback: (String) -> Promise<Promise<NotificationCompletion>>
   ) {
-    foregroundCallback = callback
+    NotificationEvents.setForegroundCallback { json -> callback(json).settle() }
   }
 
   override fun onNotificationOpened(callback: (String) -> Promise<Promise<Unit>>) {
-    openedCallback = callback
+    NotificationEvents.setOpenedCallback { json -> callback(json).settle() }
   }
 
   override fun onNotificationReceivedBackground(
     callback: (String) -> Promise<Promise<BackgroundFetchResult>>
   ) {
-    backgroundCallback = callback
+    NotificationEvents.setBackgroundCallback { json -> callback(json).settle() }
   }
 
-  private fun isRemoteNotificationExtras(extras: Bundle): Boolean =
-    extras.containsKey("google.message_id") || extras.containsKey("google.sent_time")
-
-  private fun bundleToJson(bundle: Bundle): String {
-    val json = JSONObject()
-    for (key in bundle.keySet()) {
-      @Suppress("DEPRECATION")
-      json.put(key, JSONObject.wrap(bundle.get(key)) ?: JSONObject.NULL)
-    }
-    return json.toString()
+  private companion object {
+    const val TAG = "ObiNotifications"
   }
 
-  companion object {
-    private const val TAG = "ObiNotifications"
-    const val DEFAULT_CHANNEL_ID = "default"
+  private fun <T> Promise<Promise<T>>.settle() {
+    then { inner -> inner.catch { } }.catch { }
   }
 }
