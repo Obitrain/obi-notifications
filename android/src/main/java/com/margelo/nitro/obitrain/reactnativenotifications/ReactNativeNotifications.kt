@@ -42,31 +42,29 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
 
   override fun registerRemoteNotifications(): Promise<Unit> {
     val promise = Promise<Unit>()
-    fetchToken(promise, 0)
+    registerWithFcm(promise, 0)
     return promise
   }
 
-  @Suppress("DEPRECATION")
-  private fun fetchToken(promise: Promise<Unit>, retryCount: Int) {
-    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+  private fun registerWithFcm(promise: Promise<Unit>, retryCount: Int) {
+    FirebaseMessaging.getInstance().register().addOnCompleteListener { task ->
       if (task.isSuccessful) {
-        NotificationEvents.emitToken(task.result)
         promise.resolve(Unit)
         return@addOnCompleteListener
       }
-      if (retryCount < TOKEN_FETCH_MAX_RETRIES) {
-        val retryDelay = TOKEN_FETCH_RETRY_DELAY_MS * (1L shl retryCount)
+      if (retryCount < REGISTRATION_MAX_RETRIES) {
+        val retryDelay = REGISTRATION_RETRY_DELAY_MS * (1L shl retryCount)
         mainHandler.postDelayed(
-          { fetchToken(promise, retryCount + 1) },
+          { registerWithFcm(promise, retryCount + 1) },
           retryDelay
         )
         return@addOnCompleteListener
       }
       registrationFailedCallback?.invoke(
         RegistrationErrorEvent(
-          code = "fcm-token-fetch-failed",
+          code = "fcm-registration-failed",
           domain = "com.google.firebase.messaging",
-          localizedDescription = task.exception?.message ?: "Unknown FCM token error"
+          localizedDescription = task.exception?.message ?: "Unknown FCM registration error"
         )
       )
       promise.resolve(Unit)
@@ -137,8 +135,8 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
 
   private companion object {
     const val TAG = "ObiNotifications"
-    const val TOKEN_FETCH_MAX_RETRIES = 3
-    const val TOKEN_FETCH_RETRY_DELAY_MS = 10_000L
+    const val REGISTRATION_MAX_RETRIES = 3
+    const val REGISTRATION_RETRY_DELAY_MS = 10_000L
   }
 
   private fun <T> Promise<Promise<T>>.settle() {

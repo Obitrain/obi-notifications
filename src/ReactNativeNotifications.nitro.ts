@@ -39,8 +39,8 @@ export interface ReactNativeNotifications extends HybridObject<{
   /**
    * iOS: request notification permission, then register with APNs.
    * Resolves once the permission dialog completed (not when the token arrives).
-   * Android: fetch the current FCM token with bounded retries.
-   * The token itself is delivered through onTokenReceived.
+   * Android: register the Firebase Installation ID with FCM using bounded retries.
+   * The registration identifier is delivered through onTokenReceived.
    */
   registerRemoteNotifications(): Promise<void>;
 
@@ -53,7 +53,7 @@ export interface ReactNativeNotifications extends HybridObject<{
   /** Android only: create/update a notification channel. No-op on iOS. */
   setNotificationChannel(channel: NotificationChannelConfig): void;
 
-  /** Raw APNs device token (hex) on iOS, FCM registration token on Android. */
+  /** Raw APNs device token (hex) on iOS, Firebase Installation ID on Android. */
   onTokenReceived(callback: (deviceToken: string) => void): void;
 
   onRegistrationFailed(callback: (error: RegistrationErrorEvent) => void): void;

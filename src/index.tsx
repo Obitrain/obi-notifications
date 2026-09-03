@@ -95,8 +95,8 @@ const events = {
 export const Notifications = {
   /**
    * iOS: request permission + register with APNs.
-   * Android: fetch the FCM token with bounded retries.
-   * Tokens are delivered through registerRemoteNotificationsRegistered.
+   * Android: register the Firebase Installation ID with bounded retries.
+   * Registration identifiers arrive through registerRemoteNotificationsRegistered.
    */
   registerRemoteNotifications(): Promise<void> {
     return native.registerRemoteNotifications();

@@ -107,7 +107,7 @@ import {
 const events = Notifications.events();
 
 events.registerRemoteNotificationsRegistered(({ deviceToken }) => {
-  // iOS: APNs token as lowercase hex. Android: FCM registration token.
+  // iOS: APNs token as lowercase hex. Android: Firebase Installation ID.
 });
 
 events.registerRemoteNotificationsRegistrationFailed(({ code, domain, localizedDescription }) => {});
@@ -126,8 +126,8 @@ events.registerNotificationReceivedBackground((notification, completion) => {
 });
 
 // iOS: prompts for alert, badge, and sound permission, then registers with APNs.
-// Android: fetches the current FCM token with bounded retries.
-// The token arrives through the registered event, not the returned promise.
+// Android: registers the Firebase Installation ID with bounded retries.
+// The identifier arrives through the registered event, not the returned promise.
 await Notifications.registerRemoteNotifications();
 
 // The notification whose tap launched the app, or undefined.
@@ -138,7 +138,7 @@ const initial = await Notifications.getInitialNotification();
 
 | Member | Platform | Behaviour |
 | --- | --- | --- |
-| `registerRemoteNotifications(): Promise<void>` | both | iOS: requests alert, badge, and sound permission, then calls `registerForRemoteNotifications`. Resolves when the permission prompt completes, before the token arrives. Android: fetches the FCM token, retrying failures after 10, 20, and 40 seconds. |
+| `registerRemoteNotifications(): Promise<void>` | both | iOS: requests alert, badge, and sound permission, then calls `registerForRemoteNotifications`. Resolves when the permission prompt completes, before the token arrives. Android: registers the Firebase Installation ID with FCM, retrying failures after 10, 20, and 40 seconds. |
 | `getInitialNotification(): Promise<Notification \| undefined>` | both | Payload of the notification whose tap launched the app, `undefined` on a normal launch. iOS returns it once and then clears it. Android reads the launch intent's extras and returns them whenever they carry a `google.message_id` or `google.sent_time` key. |
 | `postLocalNotification(payload)` | Android | Posts a notification immediately with `payload.title` and `payload.body` (or `payload.notification.title` / `.body`) on `payload.channelId`, else the FCM default channel from the manifest, else `default`. Create the channel with `setNotificationChannel` first; Android 8+ drops notifications on unknown channels. Tapping it re-enters the app with the payload (see the Android section). Used to display FCM messages that arrive while the app is in the foreground, which FCM does not display itself. |
 | `setNotificationChannel(config)` | Android | Creates or updates a notification channel. `importance` takes `NotificationManager` values 0 to 5. |
@@ -152,7 +152,7 @@ const initial = await Notifications.getInitialNotification();
 | `registerNotificationOpened` | `(notification, completion: () => void) => void` |
 | `registerNotificationReceivedBackground` | `(notification, completion: (r: NotificationBackgroundFetchResult) => void) => void` |
 
-Each registrar replaces the previous callback for that event. A device token received before `registerRemoteNotificationsRegistered` is called is replayed on registration. On Android, foreground and opened events that arrive before their callback is registered are queued (last 10) and replayed; background events are dropped when no callback is registered, since the app process may have been started by FCM without JS. On iOS, register callbacks before calling `registerRemoteNotifications()`.
+Each registrar replaces the previous callback for that event. A registration identifier received before `registerRemoteNotificationsRegistered` is called is replayed on registration. On Android, foreground and opened events that arrive before their callback is registered are queued (last 10) and replayed; background events are dropped when no callback is registered, since the app process may have been started by FCM without JS. On iOS, register callbacks before calling `registerRemoteNotifications()`.
 
 ### Payload shape
 
