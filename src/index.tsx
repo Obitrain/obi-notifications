@@ -95,7 +95,7 @@ const events = {
 export const Notifications = {
   /**
    * iOS: request permission + register with APNs.
-   * Android: refresh the FCM token.
+   * Android: fetch the FCM token with bounded retries.
    * Tokens are delivered through registerRemoteNotificationsRegistered.
    */
   registerRemoteNotifications(): Promise<void> {

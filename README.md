@@ -126,7 +126,7 @@ events.registerNotificationReceivedBackground((notification, completion) => {
 });
 
 // iOS: prompts for alert, badge, and sound permission, then registers with APNs.
-// Android: fetches the current FCM token.
+// Android: fetches the current FCM token with bounded retries.
 // The token arrives through the registered event, not the returned promise.
 await Notifications.registerRemoteNotifications();
 
@@ -138,7 +138,7 @@ const initial = await Notifications.getInitialNotification();
 
 | Member | Platform | Behaviour |
 | --- | --- | --- |
-| `registerRemoteNotifications(): Promise<void>` | both | iOS: requests alert, badge, and sound permission, then calls `registerForRemoteNotifications`. Resolves when the permission prompt completes, before the token arrives. Android: fetches the FCM token; resolves after the fetch attempt. |
+| `registerRemoteNotifications(): Promise<void>` | both | iOS: requests alert, badge, and sound permission, then calls `registerForRemoteNotifications`. Resolves when the permission prompt completes, before the token arrives. Android: fetches the FCM token, retrying failures after 10, 20, and 40 seconds. |
 | `getInitialNotification(): Promise<Notification \| undefined>` | both | Payload of the notification whose tap launched the app, `undefined` on a normal launch. iOS returns it once and then clears it. Android reads the launch intent's extras and returns them whenever they carry a `google.message_id` or `google.sent_time` key. |
 | `postLocalNotification(payload)` | Android | Posts a notification immediately with `payload.title` and `payload.body` (or `payload.notification.title` / `.body`) on `payload.channelId`, else the FCM default channel from the manifest, else `default`. Create the channel with `setNotificationChannel` first; Android 8+ drops notifications on unknown channels. Tapping it re-enters the app with the payload (see the Android section). Used to display FCM messages that arrive while the app is in the foreground, which FCM does not display itself. |
 | `setNotificationChannel(config)` | Android | Creates or updates a notification channel. `importance` takes `NotificationManager` values 0 to 5. |

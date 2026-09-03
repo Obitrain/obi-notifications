@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ActivityEventListener
@@ -16,6 +18,7 @@ import org.json.JSONObject
 @DoNotStrip
 class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
   private var registrationFailedCallback: ((RegistrationErrorEvent) -> Unit)? = null
+  private val mainHandler = Handler(Looper.getMainLooper())
 
   private val context: Context?
     get() = NitroModules.applicationContext
@@ -39,21 +42,35 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
 
   override fun registerRemoteNotifications(): Promise<Unit> {
     val promise = Promise<Unit>()
+    fetchToken(promise, 0)
+    return promise
+  }
+
+  @Suppress("DEPRECATION")
+  private fun fetchToken(promise: Promise<Unit>, retryCount: Int) {
     FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
       if (task.isSuccessful) {
         NotificationEvents.emitToken(task.result)
-      } else {
-        registrationFailedCallback?.invoke(
-          RegistrationErrorEvent(
-            code = "fcm-token-fetch-failed",
-            domain = "com.google.firebase.messaging",
-            localizedDescription = task.exception?.message ?: "Unknown FCM token error"
-          )
-        )
+        promise.resolve(Unit)
+        return@addOnCompleteListener
       }
+      if (retryCount < TOKEN_FETCH_MAX_RETRIES) {
+        val retryDelay = TOKEN_FETCH_RETRY_DELAY_MS * (1L shl retryCount)
+        mainHandler.postDelayed(
+          { fetchToken(promise, retryCount + 1) },
+          retryDelay
+        )
+        return@addOnCompleteListener
+      }
+      registrationFailedCallback?.invoke(
+        RegistrationErrorEvent(
+          code = "fcm-token-fetch-failed",
+          domain = "com.google.firebase.messaging",
+          localizedDescription = task.exception?.message ?: "Unknown FCM token error"
+        )
+      )
       promise.resolve(Unit)
     }
-    return promise
   }
 
   override fun getInitialNotification(): Promise<String?> {
@@ -120,6 +137,8 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
 
   private companion object {
     const val TAG = "ObiNotifications"
+    const val TOKEN_FETCH_MAX_RETRIES = 3
+    const val TOKEN_FETCH_RETRY_DELAY_MS = 10_000L
   }
 
   private fun <T> Promise<Promise<T>>.settle() {

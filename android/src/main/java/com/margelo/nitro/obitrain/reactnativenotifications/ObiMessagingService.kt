@@ -12,6 +12,7 @@ import com.google.firebase.messaging.RemoteMessage
  * ones) and tell JS if it happens to be running.
  */
 class ObiMessagingService : FirebaseMessagingService() {
+  @Suppress("OVERRIDE_DEPRECATION")
   override fun onNewToken(token: String) {
     NotificationEvents.emitToken(token)
   }

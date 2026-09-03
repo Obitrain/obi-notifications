@@ -39,7 +39,7 @@ export interface ReactNativeNotifications extends HybridObject<{
   /**
    * iOS: request notification permission, then register with APNs.
    * Resolves once the permission dialog completed (not when the token arrives).
-   * Android: fetch the current FCM token; resolves after the fetch attempt.
+   * Android: fetch the current FCM token with bounded retries.
    * The token itself is delivered through onTokenReceived.
    */
   registerRemoteNotifications(): Promise<void>;

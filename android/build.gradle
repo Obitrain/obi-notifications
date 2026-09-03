@@ -113,6 +113,5 @@ dependencies {
   implementation "com.facebook.react:react-android"
   implementation project(":react-native-nitro-modules")
   implementation "androidx.core:core-ktx:1.13.1"
-  // matches obiapp's firebase-bom 31.1.1; the app's own BoM wins if newer
-  implementation "com.google.firebase:firebase-messaging:23.1.1"
+  implementation "com.google.firebase:firebase-messaging:25.1.2"
 }
