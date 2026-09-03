@@ -32,8 +32,11 @@ object NotificationPayload {
     val json = JSONObject()
     for (key in extras.keySet()) {
       if (key == EXTRA_MARKER) continue
-      @Suppress("DEPRECATION")
-      json.put(key, JSONObject.wrap(extras.get(key)) ?: JSONObject.NULL)
+      if (key == KEY_SENT_TIME) {
+        json.put(key, extras.getLong(key))
+      } else {
+        extras.getString(key)?.let { json.put(key, it) }
+      }
     }
     return json
   }
