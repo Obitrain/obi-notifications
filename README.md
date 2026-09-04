@@ -1,8 +1,8 @@
 # @obitrain/react-native-notifications
 
-Push notifications for obiapp as a [Nitro module](https://nitro.margelo.com/): raw APNs on iOS, Firebase Cloud Messaging (FCM) on Android. Kotlin and Swift, React Native 0.87 with the New Architecture, no Expo.
+Push notifications for obiapp as a [Nitro module](https://nitro.margelo.com/): raw APNs on iOS, [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) (FCM) on Android. Kotlin and Swift, React Native 0.87 with the New Architecture, no Expo.
 
-The library replaces wix `react-native-notifications` and uses the same JS syntax. It is built for a single consumer with a single configuration: there are no feature flags, podspec subspecs, or optional dependencies.
+The library replaces wix [`react-native-notifications`](https://github.com/wix/react-native-notifications) and uses the same JS syntax. It is built for a single consumer with a single configuration: there are no feature flags, podspec subspecs, or optional dependencies.
 
 ## Requirements
 
