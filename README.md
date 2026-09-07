@@ -64,7 +64,7 @@ Why two pods: a nitrogen-generated pod exposes C++ headers through its clang mod
 
    `attach()` makes the library the `UNUserNotificationCenter` delegate. If another SDK replaces that delegate later, foreground and opened events stop arriving.
 
-   A complete, working `AppDelegate` is in [`example/ios/ReactNativeNotificationsExample/AppDelegate.swift`](example/ios/ReactNativeNotificationsExample/AppDelegate.swift).
+   The example generates these callbacks through its [Expo config plugin](example/plugins/with-notifications.js).
 
 3. For silent (`content-available`) pushes, the app's `Info.plist` needs `UIBackgroundModes` containing `remote-notification`.
 
@@ -187,9 +187,9 @@ yarn typecheck
 yarn lint
 ```
 
-The example app lives in `example/`. Start Metro with `yarn example start` and run a platform with `yarn example ios` or `yarn example android`.
+The [Expo development example](example/README.md) lives in `example/`. Configure Firebase, then generate its native projects with `yarn example prebuild --clean`. Start Metro with `yarn example start` and run a platform with `yarn example ios` or `yarn example android`.
 
-The Android example uses `applicationId com.obitrain.obiapp.dev.release` so that obiapp's Firebase project accepts it. Copy obiapp's `android/app/google-services.json` into `example/android/app/` to run it; the file is gitignored.
+The Android example uses `applicationId com.obitrain.obiapp.dev.release` so that obiapp's Firebase project accepts it. Copy obiapp's `android/app/google-services.json` to `example/google-services.json` before prebuild; the file is gitignored. For compilation only, set `GOOGLE_SERVICES_JSON=./google-services.ci.json` to use the existing CI fixture.
 
 On the iOS simulator, `xcrun simctl push <UDID> payload.apns` delivers a notification to the running example, where `payload.apns` includes a `"Simulator Target Bundle"` key set to the example's bundle id.
 
