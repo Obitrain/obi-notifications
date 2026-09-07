@@ -87,3 +87,9 @@ nitrogen/
 
 # Firebase config borrowed from obiapp for local FCM testing
 example/android/app/google-services.json
+
+# Generated Expo example projects
+/example/ios/
+/example/android/
+/example/dist/
+/example/google-services.json
