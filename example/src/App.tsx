@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -88,23 +89,25 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" hidden={false} />
       <TouchableOpacity
         style={styles.button}
         onPress={register}
         testID="register-btn"
       >
-        <Text style={styles.buttonLabel}>Register for notifications</Text>
+        <Text style={styles.buttonLabel}>Register for remote push</Text>
       </TouchableOpacity>
-      {Platform.OS === 'android' && (
-        <TouchableOpacity
-          style={[styles.button, styles.secondary]}
-          onPress={postLocal}
-          testID="post-local-btn"
-        >
-          <Text style={styles.buttonLabel}>Post local notification</Text>
-        </TouchableOpacity>
-      )}
-      <Text style={styles.label}>Token:</Text>
+      <TouchableOpacity
+        style={[styles.button, styles.secondary]}
+        onPress={postLocal}
+        testID="post-local-btn"
+      >
+        <Text style={styles.buttonLabel}>Test local notification</Text>
+      </TouchableOpacity>
+      <Text style={styles.label}>
+        Local tests need notification permission, not APNs signing.
+      </Text>
+      <Text style={styles.label}>APNs / FCM token:</Text>
       <Text testID="token" style={styles.token} selectable>
         {token ?? '(none)'}
       </Text>
@@ -124,6 +127,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
     paddingTop: 80,
     paddingHorizontal: 16,
   },
@@ -142,10 +146,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   label: {
+    color: '#111827',
     marginTop: 16,
     fontWeight: '700',
   },
   token: {
+    color: '#111827',
     marginTop: 4,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     fontSize: 12,
@@ -159,6 +165,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logLine: {
+    color: '#111827',
     fontSize: 11,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     marginBottom: 2,

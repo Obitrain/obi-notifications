@@ -108,7 +108,7 @@ export const Notifications = {
     return payloadJson == null ? undefined : parseNotification(payloadJson);
   },
 
-  /** Android only: render a notification while the app is foregrounded. */
+  /** Post a local notification; iOS requests alert permission if needed. */
   postLocalNotification(payload: any): void {
     native.postLocalNotification(JSON.stringify(payload ?? {}));
   },
