@@ -64,7 +64,7 @@ Why two pods: a nitrogen-generated pod exposes C++ headers through its clang mod
 
    `attach()` makes the library the `UNUserNotificationCenter` delegate. If another SDK replaces that delegate later, foreground and opened events stop arriving.
 
-   A complete, working `AppDelegate` is in [`example/ios/ReactNativeNotificationsExample/AppDelegate.swift`](example/ios/ReactNativeNotificationsExample/AppDelegate.swift).
+   The example generates these callbacks through its [Expo config plugin](example/plugins/with-notifications.js).
 
 3. For silent (`content-available`) pushes, the app's `Info.plist` needs `UIBackgroundModes` containing `remote-notification`.
 
@@ -140,7 +140,7 @@ const initial = await Notifications.getInitialNotification();
 | --- | --- | --- |
 | `registerRemoteNotifications(): Promise<void>` | both | iOS: requests alert, badge, and sound permission, then calls `registerForRemoteNotifications`. Resolves when the permission prompt completes, before the token arrives. Android: registers the Firebase Installation ID with FCM, retrying failures after 10, 20, and 40 seconds. |
 | `getInitialNotification(): Promise<Notification \| undefined>` | both | Payload of the notification whose tap launched the app, `undefined` on a normal launch. iOS returns it once and then clears it. Android reads the launch intent's extras and returns them whenever they carry a `google.message_id` or `google.sent_time` key. |
-| `postLocalNotification(payload)` | Android | Posts a notification immediately with `payload.title` and `payload.body` (or `payload.notification.title` / `.body`) on `payload.channelId`, else the FCM default channel from the manifest, else `default`. Create the channel with `setNotificationChannel` first; Android 8+ drops notifications on unknown channels. Tapping it re-enters the app with the payload (see the Android section). Used to display FCM messages that arrive while the app is in the foreground, which FCM does not display itself. |
+| `postLocalNotification(payload)` | Both | iOS requests alert permission and schedules a local notification after one second using `title`, `body`, and optional `id`; no APNs token is required. Android: Posts a notification immediately with `payload.title` and `payload.body` (or `payload.notification.title` / `.body`) on `payload.channelId`, else the FCM default channel from the manifest, else `default`. Create the channel with `setNotificationChannel` first; Android 8+ drops notifications on unknown channels. Tapping it re-enters the app with the payload (see the Android section). Used to display FCM messages that arrive while the app is in the foreground, which FCM does not display itself. |
 | `setNotificationChannel(config)` | Android | Creates or updates a notification channel. `importance` takes `NotificationManager` values 0 to 5. |
 | `events()` | both | Returns the event registrars below. |
 
@@ -187,9 +187,9 @@ yarn typecheck
 yarn lint
 ```
 
-The example app lives in `example/`. Start Metro with `yarn example start` and run a platform with `yarn example ios` or `yarn example android`.
+The [Expo development example](example/README.md) lives in `example/`. Configure Firebase, then generate its native projects with `yarn example prebuild --clean`. Start Metro with `yarn example start` and run a platform with `yarn example ios` or `yarn example android`.
 
-The Android example uses `applicationId com.obitrain.obiapp.dev.release` so that obiapp's Firebase project accepts it. Copy obiapp's `android/app/google-services.json` into `example/android/app/` to run it; the file is gitignored.
+The Android example uses `applicationId com.obitrain.obiapp.dev.release` so that obiapp's Firebase project accepts it. Copy obiapp's `android/app/google-services.json` to `example/google-services.json` before prebuild; the file is gitignored. For compilation only, set `GOOGLE_SERVICES_JSON=./google-services.ci.json` to use the existing CI fixture.
 
 On the iOS simulator, `xcrun simctl push <UDID> payload.apns` delivers a notification to the running example, where `payload.apns` includes a `"Simulator Target Bundle"` key set to the example's bundle id.
 

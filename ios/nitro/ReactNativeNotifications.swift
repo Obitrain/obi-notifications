@@ -35,8 +35,26 @@ class ReactNativeNotifications: HybridReactNativeNotificationsSpec {
   }
 
   func postLocalNotification(payloadJson: String) throws {
-    // Android-only API: iOS presents foreground banners via the
-    // willPresent completion options instead.
+    guard let data = payloadJson.data(using: .utf8),
+      let payload = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+    else { throw NSError(domain: "ObiNotifications", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid local notification payload"]) }
+    let content = UNMutableNotificationContent()
+    content.title = payload["title"] as? String ?? ""
+    content.body = payload["body"] as? String ?? ""
+    content.sound = .default
+    content.userInfo = payload
+    let request = UNNotificationRequest(
+      identifier: payload["id"] as? String ?? UUID().uuidString,
+      content: content,
+      trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false))
+    let notifications = UNUserNotificationCenter.current()
+    notifications.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+      if let error { NSLog("Local notification permission failed: %@", error.localizedDescription); return }
+      guard granted else { return }
+      notifications.add(request) { error in
+        if let error { NSLog("Local notification failed: %@", error.localizedDescription) }
+      }
+    }
   }
 
   func setNotificationChannel(channel: NotificationChannelConfig) throws {

@@ -40,6 +40,8 @@ The [example app](/example/) demonstrates usage of the library. You need to run 
 
 It is configured to use the local version of the library, so any changes you make to the library's source code will be reflected in the example app. Changes to the library's JavaScript code will be reflected in the example app without a rebuild, but native code changes will require a rebuild of the example app.
 
+Generate the native example projects first with `yarn example prebuild --clean`. See [the Expo example setup](example/README.md) for prerequisites and configuration. Keep example native changes in config plugins because regeneration replaces these directories.
+
 If you want to use Android Studio or Xcode to edit the native code, you can open the `example/android` or `example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `example/ios/ReactNativeNotificationsExample.xcworkspace` in Xcode and find the source files at `Pods > Development Pods > @obitrain/react-native-notifications`.
 
 To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `obitrain-react-native-notifications` under `Android`.

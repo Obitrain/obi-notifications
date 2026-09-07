@@ -1,4 +1,23 @@
 {
-  "name": "ReactNativeNotificationsExample",
-  "displayName": "ReactNativeNotificationsExample"
+  "expo": {
+    "name": "ReactNativeNotificationsExample",
+    "slug": "obi-notifications-example",
+    "version": "1.0.0",
+    "scheme": "obi-notifications-example",
+    "ios": {
+      "bundleIdentifier": "obitrain.reactnativenotifications.example",
+      "supportsTablet": true,
+      "entitlements": {
+        "aps-environment": "development"
+      }
+    },
+    "android": {
+      "package": "com.obitrain.obiapp.dev.release",
+      "allowBackup": false
+    },
+    "plugins": [
+      "expo-dev-client",
+      "./plugins/with-notifications"
+    ]
+  }
 }
