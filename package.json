@@ -39,7 +39,8 @@
     "prepare": "bob build",
     "nitrogen": "nitrogen",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\""
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "release": "bash scripts/release-pr.sh"
   },
   "keywords": [
     "react-native",
