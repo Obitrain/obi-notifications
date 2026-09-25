@@ -193,6 +193,18 @@ The Android example uses `applicationId com.obitrain.obiapp.dev.release` so that
 
 On the iOS simulator, `xcrun simctl push <UDID> payload.apns` delivers a notification to the running example, where `payload.apns` includes a `"Simulator Target Bundle"` key set to the example's bundle id.
 
+## Releasing
+
+Merging to `main` never publishes. To release, open a release PR:
+
+```sh
+yarn release 0.4.0
+```
+
+It bumps `package.json` on a `release/0.4.0` branch and opens a PR whose description (drafted from the
+commits since the last tag) becomes the release notes — edit it before merging. Merging the PR runs
+`publish.yml`: npm publish through trusted publishing, tag `v0.4.0` and the GitHub release.
+
 ## License
 
 MIT
