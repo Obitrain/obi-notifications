@@ -1491,24 +1491,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:^3.3.6":
-  version: 3.3.6
-  resolution: "@eslint/eslintrc@npm:3.3.6"
-  dependencies:
-    ajv: "npm:^6.14.0"
-    debug: "npm:^4.3.2"
-    espree: "npm:^10.0.1"
-    globals: "npm:^14.0.0"
-    ignore: "npm:^5.2.0"
-    import-fresh: "npm:^3.2.1"
-    js-yaml: "npm:^4.3.0"
-    minimatch: "npm:^3.1.5"
-    strip-json-comments: "npm:^3.1.1"
-  checksum: 10c0/349697171ee116f501a2f483bf47cd38937a61880aeb1c23481a69afc95e95859430a0947acbe1f5507f223180bf57530ecf2989e73bcbea763a6dcffdf1d010
-  languageName: node
-  linkType: hard
-
-"@eslint/eslintrc@npm:^3.3.7":
+"@eslint/eslintrc@npm:^3.3.6, @eslint/eslintrc@npm:^3.3.7":
   version: 3.3.7
   resolution: "@eslint/eslintrc@npm:3.3.7"
   dependencies:
@@ -2222,7 +2205,7 @@ __metadata:
     "@types/react": "npm:^19.2.18"
     "@types/react-refresh": "npm:^0"
     babel-preset-expo: "npm:~57.0.13"
-    expo: "npm:~57.0.25"
+    expo: "npm:~57.0.26"
     expo-dev-client: "npm:~57.0.19"
     react: "npm:19.2.3"
     react-native: "npm:0.86.3"
@@ -3306,15 +3289,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:^2.11.12":
-  version: 2.11.20
-  resolution: "baseline-browser-mapping@npm:2.11.20"
-  bin:
-    baseline-browser-mapping: dist/cli.cjs
-  checksum: 10c0/67588b7edafa4e6c52996ec4b96b6e007312961cefc5a179cb49232f6681a38ba68d4d43990081e9d0e1dcadcbd28f13105ee7dc3e43b267385d0beb14824ecc
-  languageName: node
-  linkType: hard
-
 "baseline-browser-mapping@npm:^2.11.20":
   version: 2.11.21
   resolution: "baseline-browser-mapping@npm:2.11.21"
@@ -3386,22 +3360,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.24.0, browserslist@npm:^4.28.2, browserslist@npm:^4.28.7":
-  version: 4.28.8
-  resolution: "browserslist@npm:4.28.8"
-  dependencies:
-    baseline-browser-mapping: "npm:^2.11.12"
-    caniuse-lite: "npm:^1.0.30001809"
-    electron-to-chromium: "npm:^1.5.402"
-    node-releases: "npm:^2.0.53"
-    update-browserslist-db: "npm:^1.3.0"
-  bin:
-    browserslist: cli.js
-  checksum: 10c0/047dd517c8d1f1f56a253d752c3127b8ad01c58e4cbb7e21cb5cd07ebd13e083a2237c3afb13eb60674282c9132bd4534aea2c3ff7c6f7d29be0687a00cbd537
-  languageName: node
-  linkType: hard
-
-"browserslist@npm:^4.25.0":
+"browserslist@npm:^4.24.0, browserslist@npm:^4.25.0, browserslist@npm:^4.28.2, browserslist@npm:^4.28.7":
   version: 4.28.9
   resolution: "browserslist@npm:4.28.9"
   dependencies:
@@ -3485,7 +3444,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001809, caniuse-lite@npm:^1.0.30001810":
+"caniuse-lite@npm:^1.0.30001810":
   version: 1.0.30001810
   resolution: "caniuse-lite@npm:1.0.30001810"
   checksum: 10c0/d29bc73f33c888025d54c7ff2984372d3b350b15a6a9e174884fb40976175e9177f202e2a72c2d428dddfc032784bc8ba635a31d168fcab9fac65756d7b3d6b4
@@ -3951,13 +3910,6 @@ __metadata:
   version: 1.1.1
   resolution: "ee-first@npm:1.1.1"
   checksum: 10c0/b5bb125ee93161bc16bfe6e56c6b04de5ad2aa44234d8f644813cc95d861a6910903132b05093706de2b706599367c4130eb6d170f6b46895686b95f87d017b7
-  languageName: node
-  linkType: hard
-
-"electron-to-chromium@npm:^1.5.402":
-  version: 1.5.416
-  resolution: "electron-to-chromium@npm:1.5.416"
-  checksum: 10c0/d69c0fef4fc18f4a01f7c1dfda2e7e648e4e8c6e60072dde693643a9725ba19c99353d0f5f6ba75a214c7fd7410817a518342281ee638461accb6cf24aa254ca
   languageName: node
   linkType: hard
 
@@ -4533,15 +4485,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-constants@npm:~57.0.19":
-  version: 57.0.19
-  resolution: "expo-constants@npm:57.0.19"
+"expo-constants@npm:~57.0.19, expo-constants@npm:~57.0.20":
+  version: 57.0.20
+  resolution: "expo-constants@npm:57.0.20"
   dependencies:
     "@expo/env": "npm:~2.4.3"
   peerDependencies:
     expo: "*"
     react-native: "*"
-  checksum: 10c0/c68944f58131e62dd1f2dc668e6a5202340a8baed62aa079ca3a588430d889b718e9bc12425548f7684d7b52f50354e615a0e9c2c13366d9641b4d24bb407b4e
+  checksum: 10c0/5d719dd67b92e30f7ba67917cd83010438572e5475037f9a98f7aadec40a514f1417ce3b2c8ec8a4d9c01991fb98cac656eaf068cd598d49de1b9ef5ce834523
   languageName: node
   linkType: hard
 
@@ -4660,9 +4612,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-modules-core@npm:~57.0.19":
-  version: 57.0.19
-  resolution: "expo-modules-core@npm:57.0.19"
+"expo-modules-core@npm:~57.0.20":
+  version: 57.0.20
+  resolution: "expo-modules-core@npm:57.0.20"
   dependencies:
     "@expo/expo-modules-macros-plugin": "npm:0.6.1"
     expo-modules-jsi: "npm:~57.1.1"
@@ -4674,7 +4626,7 @@ __metadata:
   peerDependenciesMeta:
     react-native-worklets:
       optional: true
-  checksum: 10c0/23e6245c56e8d1933b9544049e1bd5f4b6d18e8c49ae6711758cc2a266ddbbcca3d5be25fdccd42ffa19dc5061e5ec8320d659f4f0f31daf5ede06878da0bbc7
+  checksum: 10c0/cb630d9db9a5d1f7d4f2c229a54238e3e52c52849ed2c064ac61f7d617d22d692ac1d61270f37e3c8c834dd628a56dd432ccb0edb73cf0c37c5b55aae379ef73
   languageName: node
   linkType: hard
 
@@ -4703,9 +4655,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo@npm:~57.0.25":
-  version: 57.0.25
-  resolution: "expo@npm:57.0.25"
+"expo@npm:~57.0.26":
+  version: 57.0.26
+  resolution: "expo@npm:57.0.26"
   dependencies:
     "@babel/runtime": "npm:^7.20.0"
     "@expo/cli": "npm:^57.0.27"
@@ -4721,12 +4673,12 @@ __metadata:
     "@ungap/structured-clone": "npm:^1.3.0"
     babel-preset-expo: "npm:~57.0.13"
     expo-asset: "npm:~57.0.18"
-    expo-constants: "npm:~57.0.19"
+    expo-constants: "npm:~57.0.20"
     expo-file-system: "npm:~57.0.7"
     expo-font: "npm:~57.0.4"
     expo-keep-awake: "npm:~57.0.2"
     expo-modules-autolinking: "npm:~57.0.13"
-    expo-modules-core: "npm:~57.0.19"
+    expo-modules-core: "npm:~57.0.20"
     pretty-format: "npm:^29.7.0"
     react-refresh: "npm:^0.14.2"
     whatwg-url-minimum: "npm:^0.1.2"
@@ -4753,7 +4705,7 @@ __metadata:
     expo: bin/cli
     expo-modules-autolinking: bin/autolinking
     fingerprint: bin/fingerprint
-  checksum: 10c0/f403ab566b6a17129186d0a767a63f96ae0c5f8f28797164a4155bb75b370e559445ab9231f4df5e5ea7967d8eef687655d91dd2ecb6c6c660e5a05b2448b81f
+  checksum: 10c0/8dbd41fe0d74b50b1238f642f9b3a6ef7725f031d2df524a92636dd473140448ab6751a4dfc1b3a75eb6806e8d36f37149c81c2c6dd8c0092b871d5f4a04f2ae
   languageName: node
   linkType: hard
 
@@ -5752,7 +5704,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.1.0, js-yaml@npm:^4.3.0, js-yaml@npm:^4.3.2":
+"js-yaml@npm:^4.1.0, js-yaml@npm:^4.3.2":
   version: 4.3.2
   resolution: "js-yaml@npm:4.3.2"
   dependencies:
@@ -6783,7 +6735,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-releases@npm:^2.0.53, node-releases@npm:^2.0.54":
+"node-releases@npm:^2.0.54":
   version: 2.0.54
   resolution: "node-releases@npm:2.0.54"
   checksum: 10c0/196b54ab06fd03b742816b6ca8185c69af42735b283083036e2579682c430b8f9ff89046891fe8c625557e5885793a2032d28070100bb2e57e6d6586b2f483c1
@@ -8425,7 +8377,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"update-browserslist-db@npm:^1.3.0, update-browserslist-db@npm:^1.3.2":
+"update-browserslist-db@npm:^1.3.2":
   version: 1.3.2
   resolution: "update-browserslist-db@npm:1.3.2"
   dependencies:
