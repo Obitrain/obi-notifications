@@ -25,6 +25,9 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      - name: Generated Nitro code must be committed and current
+        run: yarn nitrogen && git diff --exit-code -- nitrogen src/generated
+
       - name: Lint files
         run: yarn lint
 

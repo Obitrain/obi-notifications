@@ -1,6 +1,7 @@
 # Releases only when a release/<version> PR merges (open one with `yarn release <version>`): npm publish via
 # trusted publishing (the npmjs.com trusted publisher must point at this file), tag v<version>, GitHub
-# release with the PR description as notes. Dispatch re-runs an existing release; every step is idempotent.
+# release with the PR description as notes. Dispatch re-runs a release (from its
+# tag, or main if it failed before tagging); every step is idempotent.
 name: Publish
 
 on:
@@ -10,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Existing version to re-publish (e.g. 0.3.0)
+        description: Version to (re-)publish, e.g. 0.4.0 — uses tag v<version> if it exists, else main
         required: true
 
 jobs:
@@ -31,16 +32,26 @@ jobs:
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
           INPUT_VERSION: ${{ inputs.version }}
+          PR_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
           VERSION="${INPUT_VERSION:-${HEAD_REF#release/}}"
           VERSION="${VERSION#v}"
           [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "not a semver: '$VERSION'"; exit 1; }
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # A release that failed before tagging is re-run from main; the package.json check still guards it
+          REF="$PR_SHA"
+          if [[ -n $INPUT_VERSION ]]; then
+            REF=main
+            if git ls-remote --exit-code --tags "https://github.com/$GITHUB_REPOSITORY" "refs/tags/v$VERSION" >/dev/null; then
+              REF="v$VERSION"
+            fi
+          fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          ref: ${{ inputs.version && format('v{0}', steps.v.outputs.version) || github.event.pull_request.merge_commit_sha }}
+          ref: ${{ steps.v.outputs.ref }}
           fetch-depth: 0
 
       - name: Setup
