@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.annotation.Keep
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ActivityEventListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -15,8 +16,9 @@ import com.margelo.nitro.NitroModules
 import com.margelo.nitro.core.Promise
 import org.json.JSONObject
 
+@Keep
 @DoNotStrip
-class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
+class ReactNativeNotifications @DoNotStrip constructor() : HybridReactNativeNotificationsSpec() {
   private var registrationFailedCallback: ((RegistrationErrorEvent) -> Unit)? = null
   private val mainHandler = Handler(Looper.getMainLooper())
 
