@@ -47,7 +47,14 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
   }
 
   private fun registerWithFcm(promise: Promise<Unit>, retryCount: Int) {
-    FirebaseMessaging.getInstance().register().addOnCompleteListener { task ->
+    val registration = try {
+      FirebaseMessaging.getInstance().register()
+    } catch (e: Exception) {
+      // e.g. FirebaseApp not initialized
+      failRegistration(promise, e.message)
+      return
+    }
+    registration.addOnCompleteListener { task ->
       if (task.isSuccessful) {
         promise.resolve(Unit)
         return@addOnCompleteListener
@@ -60,15 +67,20 @@ class ReactNativeNotifications : HybridReactNativeNotificationsSpec() {
         )
         return@addOnCompleteListener
       }
-      registrationFailedCallback?.invoke(
-        RegistrationErrorEvent(
-          code = "fcm-registration-failed",
-          domain = "com.google.firebase.messaging",
-          localizedDescription = task.exception?.message ?: "Unknown FCM registration error"
-        )
-      )
-      promise.resolve(Unit)
+      failRegistration(promise, task.exception?.message)
     }
+  }
+
+  private fun failRegistration(promise: Promise<Unit>, message: String?) {
+    Log.w(TAG, "FCM registration failed: $message")
+    registrationFailedCallback?.invoke(
+      RegistrationErrorEvent(
+        code = "fcm-registration-failed",
+        domain = "com.google.firebase.messaging",
+        localizedDescription = message ?: "Unknown FCM registration error"
+      )
+    )
+    promise.resolve(Unit)
   }
 
   override fun getInitialNotification(): Promise<String?> {
