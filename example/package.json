@@ -13,7 +13,7 @@
     "test:plugins": "node --test plugins/__tests__/*.test.mjs"
   },
   "dependencies": {
-    "expo": "~57.0.30",
+    "expo": "~57.0.31",
     "expo-dev-client": "~57.0.20",
     "react": "19.2.3",
     "react-native": "0.86.3",
